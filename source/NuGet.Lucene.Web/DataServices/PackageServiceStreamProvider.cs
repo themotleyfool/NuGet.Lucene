@@ -6,6 +6,10 @@ using System.Web.Routing;
 
 namespace NuGet.Lucene.Web.DataServices
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+
     public class PackageServiceStreamProvider : DefaultServiceStreamProvider
     {
         public PackageServiceStreamProvider()
@@ -26,10 +30,51 @@ namespace NuGet.Lucene.Web.DataServices
         {
             var route = RouteTable.Routes[RouteNames.Packages.Download];
 
-            var routeValues = new {id = package.Id, version = package.Version, httproute = true};
+            var routeValues = new { id = package.Id, version = package.Version, httproute = true };
+
+            var routeValueDictionary = new RouteValueDictionary(routeValues);
+
+            this.AddMissingRouteDataFromCurrentRequest(routeValueDictionary);
+
+            var virtualPathData = route.GetVirtualPath(RequestContext, routeValueDictionary);
+            if (virtualPathData != null)
+            {
+                var path = virtualPathData.VirtualPath;
+                return VirtualPathUtility.ToAbsolute("~/" + path);
+            }
             
-            var path = route.GetVirtualPath(RequestContext, new RouteValueDictionary(routeValues)).VirtualPath;
-            return VirtualPathUtility.ToAbsolute("~/" + path);
+            throw new InvalidOperationException("Can't calculate valid route for package!");
+        }
+
+        private string[] packagesDownloadRoutePlaceholders = null;
+
+        private void AddMissingRouteDataFromCurrentRequest(RouteValueDictionary routeValueDictionary)
+        {
+            var webRoute = RouteTable.Routes[RouteNames.Packages.Download] as Route;
+
+            if (webRoute != null)
+            {
+                if (this.packagesDownloadRoutePlaceholders == null)
+                {
+                    this.packagesDownloadRoutePlaceholders = this.GetPlaceholderKeys(webRoute.Url).ToArray();
+                }
+
+                var missingKeys = this.packagesDownloadRoutePlaceholders.Where(k => !routeValueDictionary.ContainsKey(k));
+
+                var serviceRouteData = HttpContext.Current.Request.RequestContext.RouteData;
+
+                foreach (var missingKey in missingKeys.Where(missingKey => serviceRouteData.Values.ContainsKey(missingKey)))
+                {
+                    routeValueDictionary.Add(missingKey, serviceRouteData.Values[missingKey]);
+                }
+            }
+        }
+
+        private readonly Regex placeholderRegex = new Regex(@"\{([^\}]*)}");
+
+        private IEnumerable<string> GetPlaceholderKeys(string url)
+        {
+            return placeholderRegex.Matches(url).Cast<Match>().Select(m => m.Groups[1].Value);
         }
 
         private static RequestContext RequestContext
