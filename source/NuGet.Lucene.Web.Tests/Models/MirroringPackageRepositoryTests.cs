@@ -26,7 +26,7 @@ namespace NuGet.Lucene.Web.Tests.Models
             origin = new Mock<IPackageLookup>();
             cache = new Mock<ICache>();
 
-            repo = new MirroringPackageRepository(mirror.Object, origin.Object, cache.Object);
+            repo = new MirroringPackageRepository(mirror.Object, new[] { origin.Object }, cache.Object);
 
             package1 = new LucenePackage(_ => null) { Id = "FuTools", Version = new StrictSemanticVersion("1.0"), IsMirrored = true };
             package2 = new LucenePackage(_ => null) { Id = "FuTools", Version = new StrictSemanticVersion("2.0") };
@@ -96,7 +96,7 @@ namespace NuGet.Lucene.Web.Tests.Models
         [Test]
         public void FindPackagesAlwaysGoesToOriginIfOverideToAlwaysCheckOrigin()
         {
-            repo = new EagerMirroringPackageRepository(mirror.Object, origin.Object, cache.Object);
+            repo = new EagerMirroringPackageRepository(mirror.Object, new[] { origin.Object }, cache.Object);
 
             mirror.Setup(r => r.FindPackagesById("FuTools")).Returns(new[] { package1, package2 }).Verifiable();
             origin.Setup(r => r.FindPackagesById("FuTools")).Returns(new[] { package3 }).Verifiable();

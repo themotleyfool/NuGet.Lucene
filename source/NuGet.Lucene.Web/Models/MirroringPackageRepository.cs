@@ -24,14 +24,14 @@ namespace NuGet.Lucene.Web.Models
     {
         private static readonly ILog Log = LogManager.GetLogger<MirroringPackageRepository>();
 
-        private readonly IPackageRepository origin;
+        private readonly IPackageRepository[] origins;
 
         private readonly ICache cache;
 
-        public MirroringPackageRepository(IPackageRepository mirror, IPackageRepository origin, ICache cache)
+        public MirroringPackageRepository(IPackageRepository mirror, IPackageRepository[] origins, ICache cache)
             : base(mirror)
         {
-            this.origin = origin;
+            this.origins = origins;
             this.cache = cache;
         }
 
@@ -39,12 +39,12 @@ namespace NuGet.Lucene.Web.Models
 
         public override string Source
         {
-            get { return string.Format("{0} auto-target of {1}", base.Source, origin.Source); }
+            get { return string.Format("{0} auto-target of {1}", base.Source, string.Join(", ", origins.Select(o => o.Source))); }
         }
 
         public override bool SupportsPrereleasePackages
         {
-            get { return base.SupportsPrereleasePackages || origin.SupportsPrereleasePackages; }
+            get { return base.SupportsPrereleasePackages || origins.Any(o => o.SupportsPrereleasePackages); }
         }
 
         public override IEnumerable<IPackage> FindPackagesById(string id)
@@ -85,7 +85,7 @@ namespace NuGet.Lucene.Web.Models
 
             if (package == null) return null;
 
-            Log.Info(m => m("Mirroring package {0} {1} from {2}", packageId, version, origin.Source));
+            Log.Info(m => m("Mirroring package {0} {1} from {2}", packageId, version, string.Join(", ", origins.Select(o => o.Source))));
 
             AddPackage(package);
 
@@ -99,37 +99,54 @@ namespace NuGet.Lucene.Web.Models
 
             if (result != null) return result;
 
-            try
+            var foundPackages = new List<IPackage>();
+            foreach (var origin in origins)
             {
-                result = origin.FindPackagesById(id).ToList();
-                cache.Add(key, result, TimeSpan.FromMinutes(5));
-                return result;
+                try
+                {
+                    result = origin.FindPackagesById(id).ToList();
+                    cache.Add(key, result, TimeSpan.FromMinutes(5));
+                    if (result.Any())
+                    {
+                        Log.Info(m => m("Found package {0} at {1}", id, origin.Source));
+                        foundPackages.AddRange(result);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(m => m("Exception on FindPackagesById('{0}') for package origin {1}: {2}", id, origin.Source, ex.Message), ex);
+                    return Enumerable.Empty<IPackage>();
+                }
             }
-            catch (Exception ex)
-            {
-                Log.Error(m => m("Exception on FindPackagesById('{0}') for package origin {1}: {2}", id, origin.Source, ex.Message), ex);
-                return Enumerable.Empty<IPackage>();
-            }
+            return foundPackages;
         }
 
         public virtual IPackage FindPackageInOrigin(string packageId, SemanticVersion version)
         {
-            try
+            foreach (var origin in origins)
             {
-                return origin.FindPackage(packageId, version);
+                try
+                {
+                    var package =  origin.FindPackage(packageId, version);
+                    if (package != null)
+                    {
+                      return package;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(m => m("Exception on FindPackage('{0}', '{1}') for package origin {2}: {3}", packageId, version, origin.Source, ex.Message), ex);
+                    return null;
+                }
             }
-            catch (Exception ex)
-            {
-                Log.Error(m => m("Exception on FindPackage('{0}', '{1}') for package origin {2}: {3}", packageId, version, origin.Source, ex.Message), ex);
-                return null;
-            }
+            return null;
         }
     }
 
     public class EagerMirroringPackageRepository : MirroringPackageRepository
     {
-        public EagerMirroringPackageRepository(IPackageRepository mirror, IPackageRepository origin, ICache cache)
-            : base(mirror, origin, cache)
+      public EagerMirroringPackageRepository(IPackageRepository mirror, IPackageRepository[] origins, ICache cache)
+            : base(mirror, origins, cache)
         {
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using NuGet.Lucene.Web.Models;
 using NuGet.Lucene.Web.Util;
@@ -16,15 +17,14 @@ namespace NuGet.Lucene.Web
                 return new NonMirroringPackageRepository(localRepository);
             }
 
-            var remotePackageUri = new Uri(remotePackageUrl);
-            var remoteRepository = CreateDataServicePackageRepository(new HttpClient(remotePackageUri), timeout);
+            var remoteRepositories = remotePackageUrl.Split(';').Select(s => CreateDataServicePackageRepository(new HttpClient(new Uri(s)), timeout)).ToArray();
 
             if (alwaysCheckMirror)
             {
-                return new EagerMirroringPackageRepository(localRepository, remoteRepository, new WebCache());
+              return new EagerMirroringPackageRepository(localRepository, remoteRepositories, new WebCache());
             }
 
-            return new MirroringPackageRepository(localRepository, remoteRepository, new WebCache());
+            return new MirroringPackageRepository(localRepository, remoteRepositories, new WebCache());
         }
 
         public static DataServicePackageRepository CreateDataServicePackageRepository(IHttpClient httpClient, TimeSpan timeout)
