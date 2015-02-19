@@ -99,6 +99,7 @@ namespace NuGet.Lucene.Web.Models
 
             if (result != null) return result;
 
+            var foundPackages = new List<IPackage>();
             foreach (var origin in origins)
             {
                 try
@@ -108,7 +109,7 @@ namespace NuGet.Lucene.Web.Models
                     if (result.Any())
                     {
                         Log.Info(m => m("Found package {0} at {1}", id, origin.Source));
-                        return result;
+                        foundPackages.AddRange(result);
                     }
                 }
                 catch (Exception ex)
@@ -117,7 +118,7 @@ namespace NuGet.Lucene.Web.Models
                     return Enumerable.Empty<IPackage>();
                 }
             }
-            return Enumerable.Empty<IPackage>();
+            return foundPackages;
         }
 
         public virtual IPackage FindPackageInOrigin(string packageId, SemanticVersion version)
