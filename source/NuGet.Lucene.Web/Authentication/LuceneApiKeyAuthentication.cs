@@ -9,7 +9,7 @@ namespace NuGet.Lucene.Web.Authentication
     {
         public const string ApiKeyHeader = "X-NuGet-ApiKey";
 
-        public UserStore Store { get; set; }
+        public IUserStore Store { get; set; }
 
         public IPrincipal AuthenticateRequest(IOwinRequest request)
         {

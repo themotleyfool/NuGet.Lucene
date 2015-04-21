@@ -13,7 +13,7 @@ namespace NuGet.Lucene.Web.Middleware
     /// </summary>
     public class LocalRequestAuthenticationMiddleware : AuthenticationMiddlewareBase
     {
-        public UserStore Store { get; set; }
+        public IUserStore Store { get; set; }
 
         public LocalRequestAuthenticationMiddleware(OwinMiddleware next)
             : base(next)
@@ -27,7 +27,7 @@ namespace NuGet.Lucene.Web.Middleware
 
         class LocalRequestAuthenticationHandler : UserStoreAuthenticationHandler
         {
-            public LocalRequestAuthenticationHandler(UserStore store)
+            public LocalRequestAuthenticationHandler(IUserStore store)
                 : base(store)
             {
             }

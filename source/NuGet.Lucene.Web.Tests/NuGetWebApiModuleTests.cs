@@ -25,6 +25,16 @@ namespace NuGet.Lucene.Web.Tests
         }
 
         [Test]
+        public void DisposeUserStore()
+        {
+            BuildContainer();
+
+            container.Dispose();
+
+            module.UserStore.Verify(c => c.Dispose(), Times.Once);
+        }
+
+        [Test]
         public void RegistersRepository()
         {
             BuildContainer();
@@ -47,7 +57,7 @@ namespace NuGet.Lucene.Web.Tests
         [Test]
         [TestCase(typeof(IMirroringPackageRepository))]
         [TestCase(typeof(NuGetWebApiRouteMapper))]
-        [TestCase(typeof(UserStore))]
+        [TestCase(typeof(IUserStore))]
         [TestCase(typeof(ISymbolSource))]
         [TestCase(typeof(SymbolTools))]
         public void RegistersType(Type type)
@@ -69,6 +79,7 @@ namespace NuGet.Lucene.Web.Tests
         {
             public Mock<ILuceneRepositoryConfigurator> Configurator { get; private set; }
             public Mock<ILucenePackageRepository> Repository { get; private set; }
+            public Mock<IUserStore> UserStore { get; private set; }
 
             protected override ILuceneRepositoryConfigurator InitializeRepositoryConfigurator(INuGetWebApiSettings settings)
             {
@@ -78,9 +89,10 @@ namespace NuGet.Lucene.Web.Tests
                 return Configurator.Object;
             }
 
-            protected override UserStore InitializeUserStore(INuGetWebApiSettings settings)
+            protected override IUserStore InitializeUserStore(INuGetWebApiSettings settings)
             {
-                return new UserStore(null);
+                UserStore = new Mock<IUserStore>();
+                return UserStore.Object;
             }
         }
     }

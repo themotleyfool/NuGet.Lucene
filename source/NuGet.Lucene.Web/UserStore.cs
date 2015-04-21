@@ -19,7 +19,7 @@ namespace NuGet.Lucene.Web
 
     public enum UserUpdateMode { Overwrite, NoClobber }
 
-    public class UserStore : IDisposable
+    public class UserStore : IUserStore
     {
         private readonly LuceneDataProvider provider;
 

@@ -189,6 +189,7 @@
     <Compile Include="Formatters\PackageHtmlSerializer.cs" />
     <Compile Include="Formatters\PackageSummaryListSerializer.cs" />
     <Compile Include="INuGetWebApiSettings.cs" />
+    <Compile Include="IUserStore.cs" />
     <Compile Include="Models\DelegatingPackageRepository.cs" />
     <Compile Include="Models\KeyChangeRequest.cs" />
     <Compile Include="Models\MirroringPackageRepository.cs" />

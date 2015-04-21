@@ -16,7 +16,7 @@ namespace NuGet.Lucene.Web.Tests.Middleware
         [SetUp]
         public void SetUp()
         {
-            var store = new UserStore(new LuceneDataProvider(new RAMDirectory(), Version.LUCENE_30));
+            IUserStore store = new UserStore(new LuceneDataProvider(new RAMDirectory(), Version.LUCENE_30));
             middleware = new LocalRequestAuthenticationMiddleware(next) { Store = store };
         }
 
