@@ -11,7 +11,7 @@ namespace NuGet.Lucene.Web.Middleware
 {
     public class RoleMappingAuthenticationMiddleware : AuthenticationMiddlewareBase
     {
-        public UserStore Store { get; set; }
+        public IUserStore Store { get; set; }
         public INuGetWebApiSettings Settings { get; set; }
 
         public RoleMappingAuthenticationMiddleware(OwinMiddleware next)
@@ -29,7 +29,7 @@ namespace NuGet.Lucene.Web.Middleware
             private static readonly string[] Empty = new String[0];
             private readonly NameValueCollection roleMappings;
 
-            public RoleMappingAuthenticationHandler(UserStore store, NameValueCollection roleMappings)
+            public RoleMappingAuthenticationHandler(IUserStore store, NameValueCollection roleMappings)
                 : base(store)
             {
                 this.roleMappings = roleMappings;

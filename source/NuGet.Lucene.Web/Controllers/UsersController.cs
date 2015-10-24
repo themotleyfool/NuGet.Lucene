@@ -21,7 +21,7 @@ namespace NuGet.Lucene.Web.Controllers
     /// </summary>
     public class UsersController : ApiControllerBase
     {
-        public UserStore Store { get; set; }
+        public IUserStore Store { get; set; }
 
         /// <summary>
         /// Retrieves a list of all users.

@@ -2,9 +2,9 @@ namespace NuGet.Lucene.Web.Middleware
 {
     public abstract class UserStoreAuthenticationHandler : AuthenticationHandlerBase
     {
-        protected readonly UserStore store;
+        protected readonly IUserStore store;
 
-        protected UserStoreAuthenticationHandler(UserStore store)
+        protected UserStoreAuthenticationHandler(IUserStore store)
         {
             this.store = store;
         }

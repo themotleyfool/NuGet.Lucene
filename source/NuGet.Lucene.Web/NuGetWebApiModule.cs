@@ -105,7 +105,7 @@ namespace NuGet.Lucene.Web
             }
         }
 
-        protected virtual UserStore InitializeUserStore(INuGetWebApiSettings settings)
+        protected virtual IUserStore InitializeUserStore(INuGetWebApiSettings settings)
         {
             var usersDataProvider = InitializeUsersDataProvider(settings);
             var userStore = new UserStore(usersDataProvider)

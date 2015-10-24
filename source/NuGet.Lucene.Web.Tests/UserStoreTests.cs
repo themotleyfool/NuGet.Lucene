@@ -11,7 +11,7 @@ namespace NuGet.Lucene.Web.Tests
     public class UserStoreTests
     {
         private LuceneDataProvider provider;
-        private UserStore store;
+        private IUserStore store;
 
         [SetUp]
         public void SetUp()

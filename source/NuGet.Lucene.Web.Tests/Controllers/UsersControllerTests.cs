@@ -16,7 +16,7 @@ namespace NuGet.Lucene.Web.Tests.Controllers
     [TestFixture]
     public class UsersControllerTests : ApiControllerTests<UsersController>
     {
-        private UserStore store;
+        private IUserStore store;
 
         protected override UsersController CreateController()
         {

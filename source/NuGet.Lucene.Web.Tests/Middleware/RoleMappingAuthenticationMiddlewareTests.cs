@@ -16,7 +16,7 @@ namespace NuGet.Lucene.Web.Tests.Middleware
     public class RoleMappingAuthenticationMiddlewareTests : AuthenticationMiddlewareTestBase
     {
         private RoleMappingAuthenticationMiddleware middleware;
-        private UserStore store;
+        private IUserStore store;
         private NameValueCollection mappings;
         private ApiUserPrincipal domainAdminUser;
 

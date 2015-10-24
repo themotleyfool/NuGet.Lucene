@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common.Logging;
 using Lucene.Net.Linq;
 using NuGet.Lucene.Web.Authentication;
 
@@ -18,7 +19,7 @@ namespace NuGet.Lucene.Web
 
     public enum UserUpdateMode { Overwrite, NoClobber }
 
-    public class UserStore
+    public class UserStore : IUserStore
     {
         private readonly LuceneDataProvider provider;
 
@@ -251,6 +252,13 @@ namespace NuGet.Lucene.Web
         protected virtual bool IsApiKeyUnmodifiable(string username)
         {
             return IsProtectedAccount(username) && !string.IsNullOrWhiteSpace(LocalAdministratorApiKey);
+        }
+
+        public void Dispose()
+        {
+            LogManager.GetCurrentClassLogger().Info("Stopping UserStore indexing services.");
+
+            provider.Dispose();
         }
     }
 }
