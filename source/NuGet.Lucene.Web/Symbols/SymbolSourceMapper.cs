@@ -55,7 +55,7 @@ namespace NuGet.Lucene.Web.Symbols
             sb.AppendFormat("DATETIME={0}" + Environment.NewLine, DateTime.UtcNow);
             sb.AppendLine("SRCSRV: variables ------------------------------------------");
             sb.AppendLine("SRCSRVVERCTRL=http");
-            sb.AppendFormat("SRCSRVTRG={0}/%var4%/%var2%/%var5%",symbolSourceUri)
+            sb.AppendFormat("SRCSRVTRG={0}/%var4%/%var2%/%var5%",symbolSourceUri);
             sb.AppendLine("SRCSRVCMD=");
             sb.AppendLine("SRCSRV: source files ---------------------------------------");
 
