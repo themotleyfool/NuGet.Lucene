@@ -51,13 +51,11 @@ namespace NuGet.Lucene.Web.Symbols
             sb.AppendLine("SRCSRV: ini ------------------------------------------------");
             sb.AppendLine("VERSION=2");
             sb.AppendLine("INDEXVERSION=2");
-            sb.AppendLine("VERCTRL=NuGet");
+            sb.AppendLine("VERCTRL=http");
             sb.AppendFormat("DATETIME={0}" + Environment.NewLine, DateTime.UtcNow);
             sb.AppendLine("SRCSRV: variables ------------------------------------------");
             sb.AppendLine("SRCSRVVERCTRL=http");
-            sb.AppendFormat("NUGET={0}" + Environment.NewLine, symbolSourceUri);
-            sb.AppendLine("HTTP_EXTRACT_TARGET=%NUGET%/%var4%/%var2%/%var5%");
-            sb.AppendLine("SRCSRVTRG=%HTTP_EXTRACT_TARGET%");
+            sb.AppendFormat("SRCSRVTRG={0}/%var4%/%var2%/%var5%",symbolSourceUri)
             sb.AppendLine("SRCSRVCMD=");
             sb.AppendLine("SRCSRV: source files ---------------------------------------");
 
